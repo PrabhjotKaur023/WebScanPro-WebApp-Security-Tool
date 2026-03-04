@@ -22,7 +22,7 @@ def fetch_urls(base_url, session):
 
 session = requests.Session()
 
-
+# 🔥 PORT CHANGED TO 8080
 login_url = "http://localhost:8080/login.php"
 username = "admin"
 password = "password"
@@ -39,7 +39,7 @@ else:
 login_data = {
     'username': username,
     'password': password,
-    'Login': 'Login'
+    'Login': 'Login' 
 }
 
 if user_token_value:
@@ -51,6 +51,7 @@ if response.status_code != 200:
     print("Login failed")
     exit()
 
+# 🔥 PORT CHANGED TO 8080
 base_url = "http://localhost:8080/index.php"
 urls = fetch_urls(base_url, session)
 
