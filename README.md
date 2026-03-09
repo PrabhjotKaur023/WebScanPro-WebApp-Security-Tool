@@ -1,84 +1,78 @@
-🔐 WebScanPro – Web Application Security Testing Tool
+# 🔐 WebScanPro – Web Application Security Testing Tool
 
-🚧 Project Status: Currently in Development
+🚧 **Project Status:** Currently in Development  
 
-WebScanPro is an automated Web Application Security Testing Tool designed to identify vulnerabilities in web applications. The tool scans websites, extracts forms and URLs, and tests them with security payloads to detect potential vulnerabilities such as SQL Injection.
+WebScanPro is an automated **Web Application Security Testing Tool** designed to identify common vulnerabilities in web applications. The tool scans websites, extracts forms and URLs, and tests them using security payloads to detect vulnerabilities such as **SQL Injection**.
 
-This project is being developed as part of the Infosys Internship Program, where the focus is on applying automation, data analysis, and cybersecurity concepts to build a practical security testing solution.
+This project is being developed as part of the **Infosys Internship Program**, where the focus is on applying **automation, data analysis, and cybersecurity concepts** to build a practical security testing solution.
 
-🎯 Project Goals
+---
 
-Develop an automated tool to scan web applications for vulnerabilities
+## 🎯 Project Goals
 
-Extract URLs and forms from websites for security testing
+- Develop an automated tool to **scan web applications for vulnerabilities**
+- Extract **URLs and forms** from websites for testing
+- Analyze server responses to detect suspicious behavior
+- Store results in structured formats for reporting
+- Improve security testing efficiency through automation
 
-Test input fields with security payloads
+---
 
-Analyze server responses to detect possible vulnerabilities
+## ⚙️ How WebScanPro Works
 
-Store and organize scan results for further analysis
+The tool follows these steps:
 
-⚙️ How the Tool Works
+1. **Website Crawling**  
+   Collects internal links from the target website.
 
-The system follows these steps:
+2. **Form Extraction**  
+   Detects HTML forms and identifies input fields.
 
-1️⃣ Website Crawling
-Collects internal links from the target website.
+3. **Payload Injection**  
+   Sends specially crafted payloads to form inputs to test vulnerabilities.
 
-2️⃣ Form Extraction
-Detects HTML forms and identifies input fields.
+4. **Response Analysis**  
+   Analyzes server responses to detect database errors or suspicious patterns.
 
-3️⃣ Payload Injection
-Sends specially crafted payloads to test form inputs.
+5. **Report Generation**  
+   Stores detected vulnerabilities in structured files.
 
-4️⃣ Response Analysis
-Analyzes responses to detect possible vulnerabilities.
+---
 
-5️⃣ Report Generation
-Stores results in structured files for security reporting.
+## 🧩 Project Modules
 
-🧩 Project Modules
-🌐 URL Crawler
+### 🌐 URL Crawler
+- Crawls the target website
+- Collects internal URLs
+- Saves results in `urls.json`
 
-Crawls the target website
+### 📝 Form Extractor
+- Detects and extracts HTML forms
+- Captures form actions, methods, and input fields
+- Stores extracted data in `forms.json`
 
-Collects internal URLs
+### 💉 SQL Injection Scanner
+- Sends SQL payloads to input fields
+- Analyzes responses for database error patterns
+- Detects possible SQL Injection vulnerabilities
 
-Stores results in urls.json
+### 📊 Vulnerability Reporter
+- Stores detected vulnerabilities
+- Generates reports in `vulnerabilities.json`
 
-📝 Form Extractor
+---
 
-Detects and extracts HTML forms
+## 🛠️ Technologies Used
 
-Collects form attributes and input fields
+- **Python**
+- **Requests Library**
+- **BeautifulSoup**
+- **JSON for Data Storage**
+- **Web Security Testing Concepts**
 
-Stores extracted data in forms.json
+---
 
-💉 SQL Injection Scanner
-
-Sends SQL payloads to form inputs
-
-Analyzes responses for database error patterns
-
-📊 Vulnerability Reporter
-
-Stores detected vulnerabilities
-
-Generates reports in vulnerabilities.json
-
-🛠️ Technologies Used
-
-Python
-
-Requests Library
-
-BeautifulSoup
-
-JSON for Data Storage
-
-Web Security Testing Concepts
-
-📂 Project Structure
+## 📂 Project Structure
 WebScanPro
 │
 ├── crawler.py
@@ -88,26 +82,29 @@ WebScanPro
 ├── forms.json
 ├── vulnerabilities.json
 └── README.md
-📚 Learning Outcomes
+
+
+---
+
+## 📚 Learning Outcomes
 
 Through this internship project, I am developing skills in:
 
-Web application security testing
+- Web application security testing  
+- Python automation scripting  
+- Web scraping and data collection  
+- Vulnerability detection techniques  
+- Practical cybersecurity concepts  
 
-Python automation scripting
+---
 
-Data collection and analysis
+## 🚀 Future Enhancements
 
-Vulnerability detection techniques
+- Add **Cross-Site Scripting (XSS) detection**
+- Improve vulnerability detection accuracy
+- Build a **dashboard for vulnerability reports**
+- Implement **advanced automated security testing**
 
-Practical cybersecurity concepts
+---
 
-🚀 Future Enhancements
-
-Add Cross-Site Scripting (XSS) detection
-
-Improve vulnerability detection accuracy
-
-Build a web dashboard for scan results
-
-Implement advanced automated security testing
+👨‍💻 **Developed as part of the Infosys Internship Program**
