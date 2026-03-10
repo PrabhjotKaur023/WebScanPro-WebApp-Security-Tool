@@ -1,117 +1,74 @@
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 import json
+from urllib.parse import urljoin
 
 BASE = "http://localhost:8080/"
-LOGIN_URL = urljoin(BASE, "login.php")
-START_URL = urljoin(BASE, "index.php")
 
 session = requests.Session()
 
+# -------- LOAD URLS --------
+with open("urls.json", "r") as f:
+    urls = json.load(f)
 
-# ---------- LOGIN ----------
-def login():
-    login_page = session.get(LOGIN_URL)
-    soup = BeautifulSoup(login_page.text, "html.parser")
+forms_data = []
 
-    token = soup.find("input", {"name": "user_token"})
-    token_value = token["value"] if token else None
-
-    data = {
-        "username": "admin",
-        "password": "password",
-        "Login": "Login"
-    }
-
-    if token_value:
-        data["user_token"] = token_value
-
-    res = session.post(LOGIN_URL, data=data)
-
-    if res.status_code != 200:
-        print("Login failed")
-        exit()
-
-    print("Login success")
-
-
-# ---------- FETCH URLS ----------
-def fetch_urls(base_url):
-    res = session.get(base_url)
-    soup = BeautifulSoup(res.text, "html.parser")
-
-    links = []
-
-    for a in soup.find_all("a", href=True):
-        full = urljoin(BASE, a["href"])
-
-        if full.startswith(BASE):
-            links.append(full)
-
-    return links
-
-
-# ---------- EXTRACT FORMS ----------
+# -------- FUNCTION TO EXTRACT FORMS --------
 def extract_forms(url):
-    forms_data = []
+    try:
+        response = session.get(url)
+        soup = BeautifulSoup(response.text, "html.parser")
 
-    res = session.get(url)
-    soup = BeautifulSoup(res.text, "html.parser")
+        forms = soup.find_all("form")
 
-    for form in soup.find_all("form"):
+        for form in forms:
+            action = form.get("action")
 
-        action = form.get("action")
+            if action:
+                action = urljoin(BASE, action)
+            else:
+                action = url
 
-        if action:
-            action = urljoin(BASE, action)
-        else:
-            action = url
+            method = form.get("method", "get").lower()
 
-        # ignore login form
-        if action.endswith("login.php"):
-            continue
+            inputs = []
 
-        form_info = {
-            "page": url,
-            "action": action,
-            "method": form.get("method", "get").lower(),
-            "inputs": []
-        }
+            for inp in form.find_all("input"):
+                inputs.append({
+                    "name": inp.get("name"),
+                    "type": inp.get("type", "text")
+                })
 
-        for inp in form.find_all("input"):
-            form_info["inputs"].append({
-                "name": inp.get("name"),
-                "type": inp.get("type", "text")
-            })
+            form_details = {
+                "page": url,
+                "action": action,
+                "method": method,
+                "inputs": inputs
+            }
 
-        forms_data.append(form_info)
+            forms_data.append(form_details)
 
-    return forms_data
+    except:
+        print("Error scanning:", url)
 
 
-# ---------- MAIN ----------
-login()
+# -------- SCAN ALL URLS --------
+for url in urls:
+    extract_forms(url)
 
-urls = fetch_urls(START_URL)
-
-all_forms = []
-
-for u in urls:
-    forms = extract_forms(u)
-    all_forms.extend(forms)
-
-# ---- remove duplicates ----
-unique = []
+# -------- REMOVE DUPLICATES --------
+unique_forms = []
 seen = set()
 
-for f in all_forms:
-    key = json.dumps(f, sort_keys=True)
+for form in forms_data:
+    key = json.dumps(form, sort_keys=True)
+
     if key not in seen:
         seen.add(key)
-        unique.append(f)
+        unique_forms.append(form)
 
+# -------- SAVE TO FILE --------
 with open("forms.json", "w") as f:
-    json.dump(unique, f, indent=4)
+    json.dump(unique_forms, f, indent=4)
 
 print("Forms saved to forms.json")

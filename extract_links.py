@@ -3,59 +3,70 @@ from bs4 import BeautifulSoup
 import json
 from urllib.parse import urljoin
 
-def fetch_urls(base_url, session):
-    try:
-        response = session.get(base_url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        links = []
-        for a_tag in soup.find_all('a', href=True):
-            href = a_tag['href']
-            full_url = urljoin(base_url, href)
-            links.append(full_url)
-        
-        return links
-    except requests.RequestException as e:
-        print(f"Error fetching the page: {e}")
-        return []
+BASE = "http://localhost:8080/"
+LOGIN_URL = urljoin(BASE, "login.php")
+START_URL = urljoin(BASE, "index.php")
 
 session = requests.Session()
 
-# 🔥 PORT CHANGED TO 8080
-login_url = "http://localhost:8080/login.php"
-username = "admin"
-password = "password"
+visited = set()
+urls = []
 
-login_page = session.get(login_url)
-soup = BeautifulSoup(login_page.text, 'html.parser')
+# -------- LOGIN --------
+login_page = session.get(LOGIN_URL)
+soup = BeautifulSoup(login_page.text, "html.parser")
 
-user_token = soup.find('input', {'name': 'user_token'})
-if user_token:
-    user_token_value = user_token['value']
-else:
-    user_token_value = None
+token = soup.find("input", {"name": "user_token"})
+token_value = token["value"] if token else ""
 
 login_data = {
-    'username': username,
-    'password': password,
-    'Login': 'Login' 
+    "username": "admin",
+    "password": "password",
+    "Login": "Login",
+    "user_token": token_value
 }
 
-if user_token_value:
-    login_data['user_token'] = user_token_value
+login_response = session.post(LOGIN_URL, data=login_data)
 
-response = session.post(login_url, data=login_data)
-
-if response.status_code != 200:
+if "logout.php" not in login_response.text.lower():
     print("Login failed")
     exit()
 
-# 🔥 PORT CHANGED TO 8080
-base_url = "http://localhost:8080/index.php"
-urls = fetch_urls(base_url, session)
+print("Login successful")
 
-with open('urls.json', 'w') as f:
+# -------- CRAWLER FUNCTION --------
+def crawl(url):
+
+    if url in visited:
+        return
+
+    visited.add(url)
+
+    try:
+        response = session.get(url)
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        for link in soup.find_all("a", href=True):
+
+            full_url = urljoin(BASE, link["href"])
+
+            if full_url.startswith(BASE):
+
+                urls.append(full_url)
+                crawl(full_url)
+
+    except:
+        pass
+
+
+# -------- START CRAWLING --------
+crawl(START_URL)
+
+# remove duplicates
+urls = list(set(urls))
+
+# -------- SAVE --------
+with open("urls.json", "w") as f:
     json.dump(urls, f, indent=4)
 
-print("URLs saved to urls.json")
+print("All URLs saved to urls.json")
