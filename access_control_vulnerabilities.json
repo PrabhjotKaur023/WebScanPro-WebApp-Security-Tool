@@ -1,0 +1,32 @@
+[
+    {
+        "url": "http://localhost:8080/instructions.php",
+        "vulnerability_type": "Broken Access Control",
+        "description": "Page is accessible without authentication.",
+        "remediation": "Implement proper session validation on all restricted endpoints."
+    },
+    {
+        "url": "http://localhost:8080/docs/DVWA_v1.3.pdf",
+        "vulnerability_type": "Broken Access Control",
+        "description": "Page is accessible without authentication.",
+        "remediation": "Implement proper session validation on all restricted endpoints."
+    },
+    {
+        "url": "http://localhost:8080/instructions.php?doc=PHPIDS-license",
+        "vulnerability_type": "Broken Access Control",
+        "description": "Page is accessible without authentication.",
+        "remediation": "Implement proper session validation on all restricted endpoints."
+    },
+    {
+        "url": "http://localhost:8080/about.php",
+        "vulnerability_type": "Broken Access Control",
+        "description": "Page is accessible without authentication.",
+        "remediation": "Implement proper session validation on all restricted endpoints."
+    },
+    {
+        "url": "http://localhost:8080/setup.php",
+        "vulnerability_type": "Broken Access Control",
+        "description": "Page is accessible without authentication.",
+        "remediation": "Implement proper session validation on all restricted endpoints."
+    }
+]

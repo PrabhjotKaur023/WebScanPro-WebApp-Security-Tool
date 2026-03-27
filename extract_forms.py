@@ -4,8 +4,36 @@ import json
 from urllib.parse import urljoin
 
 BASE = "http://localhost:8080/"
+LOGIN_URL = BASE + "login.php"
 
 session = requests.Session()
+
+
+# ---------- LOGIN ----------
+def login():
+    res = session.get(LOGIN_URL)
+    soup = BeautifulSoup(res.text, "html.parser")
+
+    token = soup.find("input", {"name": "user_token"})
+    token_value = token["value"] if token else ""
+
+    data = {
+        "username": "admin",
+        "password": "password",
+        "Login": "Login",
+        "user_token": token_value
+    }
+
+    login = session.post(LOGIN_URL, data=data)
+
+    if "logout.php" in login.text:
+        print("[+] Login successful")
+    else:
+        print("[-] Login failed")
+        exit()
+
+    session.cookies.set("security", "low")
+
 
 # -------- LOAD URLS --------
 with open("urls.json", "r") as f:
@@ -13,12 +41,17 @@ with open("urls.json", "r") as f:
 
 forms_data = []
 
-# -------- FUNCTION TO EXTRACT FORMS --------
+
+# -------- EXTRACT FORMS --------
 def extract_forms(url):
     try:
         response = session.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
 
+        # 🔥 SKIP if redirected to login
+        if "login.php" in response.url:
+            return
+
+        soup = BeautifulSoup(response.text, "html.parser")
         forms = soup.find_all("form")
 
         for form in forms:
@@ -48,13 +81,17 @@ def extract_forms(url):
 
             forms_data.append(form_details)
 
-    except:
-        print("Error scanning:", url)
+    except Exception as e:
+        print("Error scanning:", url, e)
 
 
-# -------- SCAN ALL URLS --------
+# ---------- MAIN ----------
+login()
+
 for url in urls:
+    print("Scanning:", url)
     extract_forms(url)
+
 
 # -------- REMOVE DUPLICATES --------
 unique_forms = []
@@ -67,8 +104,9 @@ for form in forms_data:
         seen.add(key)
         unique_forms.append(form)
 
-# -------- SAVE TO FILE --------
-with open("forms.json", "w") as f:
+
+# -------- SAVE --------
+with open("forms.json", "w", encoding="utf-8") as f:
     json.dump(unique_forms, f, indent=4)
 
-print("Forms saved to forms.json")
+print("\nForms saved to forms.json")

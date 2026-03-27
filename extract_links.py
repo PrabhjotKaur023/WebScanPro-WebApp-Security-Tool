@@ -12,6 +12,7 @@ session = requests.Session()
 visited = set()
 urls = []
 
+
 # -------- LOGIN --------
 login_page = session.get(LOGIN_URL)
 soup = BeautifulSoup(login_page.text, "html.parser")
@@ -34,6 +35,10 @@ if "logout.php" not in login_response.text.lower():
 
 print("Login successful")
 
+# 🔥 IMPORTANT FIX
+session.cookies.set("security", "low")
+
+
 # -------- CRAWLER FUNCTION --------
 def crawl(url):
 
@@ -44,29 +49,34 @@ def crawl(url):
 
     try:
         response = session.get(url)
+
+        # skip if redirected to login
+        if "login.php" in response.url:
+            return
+
         soup = BeautifulSoup(response.text, "html.parser")
 
         for link in soup.find_all("a", href=True):
 
             full_url = urljoin(BASE, link["href"])
 
-            if full_url.startswith(BASE):
-
+            if full_url.startswith(BASE) and full_url not in visited:
                 urls.append(full_url)
                 crawl(full_url)
 
-    except:
-        pass
+    except Exception as e:
+        print("Error:", e)
 
 
-# -------- START CRAWLING --------
+# -------- START --------
 crawl(START_URL)
 
 # remove duplicates
 urls = list(set(urls))
 
+
 # -------- SAVE --------
-with open("urls.json", "w") as f:
+with open("urls.json", "w", encoding="utf-8") as f:
     json.dump(urls, f, indent=4)
 
 print("All URLs saved to urls.json")
