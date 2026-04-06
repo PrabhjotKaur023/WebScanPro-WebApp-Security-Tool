@@ -121,7 +121,7 @@ def test_idor(url, form, session):
                 except requests.RequestException:
                     continue
 
-            # 🔥 CORE LOGIC
+            # CORE LOGIC
             if len(set(responses)) > 1:
 
                 print(f"[!!!] IDOR Found: Parameter '{name}'")
